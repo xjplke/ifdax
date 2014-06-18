@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+
+	<!-- Use annotations (@Autowired) for property injection -->
+	<context:annotation-config />
+
+	<!--
+		Spring will find all of our service and DAO components because they
+		have @Service and @Repository annotations. We do not need to configure
+		them in XML
+	-->
+	<context:component-scan base-package="cn.adfi.rbac.service" />
+	<context:component-scan base-package="cn.adfi.rbac.dao" />
+	<context:component-scan base-package="cn.adfi.radius.dao" />
+	<context:component-scan base-package="cn.adfi.radius.service" />
+
+	<context:property-placeholder location="classpath:target-mysql.properties"/>
+
+	<!-- jersey -->
+	<bean id="objectMapper" class="org.codehaus.jackson.map.ObjectMapper" />
+	<context:component-scan base-package="cn.adfi.rbac.controller" />
+
+	<!-- In this file we configure Hibernate and transactional behavior -->
+	<import resource="applicationContext-persistence.xml" />
+	<import resource="applicationContext-security.xml" />
+	
+	<!-- init data! -->
+	<bean id="dataBaseInitializer" class="cn.adfi.radius.dao.DataBaseInitializer" init-method="initDataBase">
+		<constructor-arg ref="userServiceImpl" />
+		<constructor-arg ref="newsServiceImpl" />
+		<constructor-arg ref="passwordEncoder" />
+		<constructor-arg ref="raduserServiceImpl" />
+	</bean>	
+</beans>
